@@ -165,7 +165,12 @@ svg {
 }
 
 .source {
-  gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
   padding: 10px;
   color: inherit;
   text-decoration: none;
@@ -175,6 +180,8 @@ svg {
 
 .source-main {
   flex: 1;
+  width: 100%;
+  min-width: 0;
   padding: 0;
   color: inherit;
   text-align: left;
@@ -216,7 +223,7 @@ svg {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-left: auto;
+  margin-left: 48px;
 }
 
 .source-open {
@@ -245,16 +252,14 @@ svg {
 }
 
 .source-menu {
-  display: grid;
-  place-items: center;
-  width: 32px;
+  min-width: 48px;
   height: 32px;
-  padding: 0;
+  padding: 0 10px;
   color: var(--muted);
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 8px;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .source-icon {
@@ -873,15 +878,6 @@ dialog::backdrop {
   .job-card,
   .plan-item {
     grid-template-columns: 1fr;
-  }
-
-  .source {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .source-actions {
-    margin-left: 48px;
   }
 
   .job-pay {

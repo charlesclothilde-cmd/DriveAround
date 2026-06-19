@@ -1,7 +1,7 @@
 const STORAGE_KEY = "drivearound-data-v2";
 
 const starterData = {
-  home: "Bristol",
+  home: "Versailles",
   sources: [
     {
       id: "movex",
@@ -20,67 +20,67 @@ const starterData = {
     {
       id: "sample-1",
       source: "movex",
-      vehicle: "Audi A3 · sample",
-      from: "Bristol",
-      to: "Cheltenham",
+      vehicle: "Peugeot 308 · exemple",
+      from: "Versailles",
+      to: "Paris",
       date: todayValue(),
       time: "08:20",
       pay: 74,
       miles: 44,
       gap: 5,
-      notes: "Example job - edit or remove",
+      notes: "Trajet exemple - modifier ou supprimer",
     },
     {
       id: "sample-2",
       source: "movex",
-      vehicle: "VW Golf · sample",
-      from: "Cheltenham",
-      to: "Oxford",
+      vehicle: "Renault Clio · exemple",
+      from: "Paris",
+      to: "Orly",
       date: todayValue(),
       time: "10:35",
       pay: 92,
-      miles: 41,
+      miles: 13,
       gap: 3,
-      notes: "Example job - edit or remove",
+      notes: "Trajet exemple - modifier ou supprimer",
     },
     {
       id: "sample-3",
       source: "shiply",
-      vehicle: "BMW 3 Series · sample",
-      from: "Oxford",
-      to: "Reading",
+      vehicle: "Citroën C3 · exemple",
+      from: "Orly",
+      to: "Fontainebleau",
       date: todayValue(),
       time: "12:20",
       pay: 68,
-      miles: 27,
+      miles: 35,
       gap: 7,
-      notes: "Example job - edit or remove",
+      notes: "Trajet exemple - modifier ou supprimer",
     },
     {
       id: "sample-4",
       source: "movex",
-      vehicle: "Ford Puma · sample",
-      from: "Reading",
-      to: "Bath",
+      vehicle: "Ford Puma · exemple",
+      from: "Fontainebleau",
+      to: "Chartres",
       date: todayValue(),
       time: "14:10",
       pay: 122,
-      miles: 78,
+      miles: 64,
       gap: 11,
-      notes: "Example job - edit or remove",
+      notes: "Trajet exemple - modifier ou supprimer",
     },
     {
       id: "sample-5",
       source: "shiply",
-      vehicle: "Nissan Juke · sample",
-      from: "Bath",
-      to: "Bristol",
+      vehicle: "Nissan Juke · exemple",
+      from: "Chartres",
+      to: "Versailles",
       date: todayValue(),
       time: "16:25",
       pay: 56,
-      miles: 13,
+      miles: 55,
       gap: 2,
-      notes: "Example job - edit or remove",
+      notes: "Trajet exemple - modifier ou supprimer",
     },
   ],
   planIds: [],
@@ -131,12 +131,25 @@ function loadData() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (stored?.sources && stored?.jobs) {
-      return {
-        home: stored.home || "",
+      const legacySampleIds = new Set(["sample-1", "sample-2", "sample-3", "sample-4", "sample-5"]);
+      const hasLegacySamples = stored.jobs.some((job) => legacySampleIds.has(job.id));
+      const migratedJobs = hasLegacySamples
+        ? [
+            ...clone(starterData.jobs),
+            ...stored.jobs.filter((job) => !legacySampleIds.has(job.id)),
+          ]
+        : stored.jobs;
+
+      const migrated = {
+        home: stored.home === "Bristol" && hasLegacySamples ? "Versailles" : stored.home || "",
         sources: stored.sources,
-        jobs: stored.jobs,
-        planIds: stored.planIds || [],
+        jobs: migratedJobs,
+        planIds: hasLegacySamples
+          ? (stored.planIds || []).filter((id) => !legacySampleIds.has(id))
+          : stored.planIds || [],
       };
+      if (hasLegacySamples) localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+      return migrated;
     }
   } catch {
     // Invalid saved data falls back to a clean starter set.
@@ -196,7 +209,7 @@ function isCompatible(job) {
 function formatMoney(value) {
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
-    currency: "GBP",
+    currency: "EUR",
     maximumFractionDigits: Number(value) % 1 ? 2 : 0,
   }).format(value);
 }
@@ -244,7 +257,7 @@ function renderSources() {
       </button>
       <span class="source-actions">
         <a class="source-open" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">Open</a>
-        <button class="source-menu" type="button" data-edit-source="${escapeHtml(source.id)}" aria-label="Edit ${escapeHtml(source.name)}">•••</button>
+        <button class="source-menu" type="button" data-edit-source="${escapeHtml(source.id)}" aria-label="Edit ${escapeHtml(source.name)}">Edit</button>
       </span>
     `;
     elements.sourceList.append(item);
@@ -297,8 +310,8 @@ function renderJobs() {
         <div class="job-meta">
           <span>${escapeHtml(source?.name || "Other")}</span>
           <span>${formatDate(job.date)} · ${escapeHtml(job.time)}</span>
-          <span>${Number(job.miles)} paid mi</span>
-          <span>${Number(job.gap)} mi gap</span>
+          <span>${Number(job.miles)} paid km</span>
+          <span>${Number(job.gap)} km gap</span>
         </div>
         ${job.notes ? `<p class="job-note">${escapeHtml(job.notes)}</p>` : ""}
         ${homebound ? '<div class="job-tags"><span class="good">Gets home</span></div>' : ""}
@@ -377,7 +390,7 @@ function updateMetrics(plan) {
 
   elements.metrics.earnings.textContent = formatMoney(earnings);
   elements.metrics.paidMiles.textContent = String(paidMiles);
-  elements.metrics.gaps.textContent = `${gaps} mi`;
+  elements.metrics.gaps.textContent = `${gaps} km`;
   elements.metrics.finish.textContent = samePlace(lastStop, state.data.home) ? "Home" : lastStop || "Not set";
 }
 
