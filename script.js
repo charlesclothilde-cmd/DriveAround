@@ -1,167 +1,165 @@
-const jobs = [
-  {
-    id: "mx-104",
-    source: "movex",
-    vehicle: "Audi A3",
-    from: "Bristol",
-    to: "Cheltenham",
-    start: "08:20",
-    pay: 74,
-    miles: 44,
-    gap: 5,
-    tags: ["near home", "dealer handover"],
-  },
-  {
-    id: "dl-221",
-    source: "dealer",
-    vehicle: "VW Golf",
-    from: "Cheltenham",
-    to: "Oxford",
-    start: "10:35",
-    pay: 92,
-    miles: 41,
-    gap: 3,
-    tags: ["tight match", "fuel card"],
-  },
-  {
-    id: "sh-552",
-    source: "shiply",
-    vehicle: "BMW 3 Series",
-    from: "Oxford",
-    to: "Reading",
-    start: "12:20",
-    pay: 68,
-    miles: 27,
-    gap: 7,
-    tags: ["quick leg", "train backup"],
-  },
-  {
-    id: "mx-118",
-    source: "movex",
-    vehicle: "Ford Puma",
-    from: "Reading",
-    to: "Bath",
-    start: "14:10",
-    pay: 122,
-    miles: 78,
-    gap: 11,
-    tags: ["heads home", "good pay"],
-  },
-  {
-    id: "dl-235",
-    source: "dealer",
-    vehicle: "Nissan Juke",
-    from: "Bath",
-    to: "Bristol",
-    start: "16:25",
-    pay: 56,
-    miles: 13,
-    gap: 2,
-    tags: ["gets home", "simple finish"],
-  },
-  {
-    id: "sh-570",
-    source: "shiply",
-    vehicle: "Mini Cooper",
-    from: "Swindon",
-    to: "Birmingham",
-    start: "13:00",
-    pay: 116,
-    miles: 74,
-    gap: 38,
-    tags: ["higher gap", "watch"],
-  },
-];
+const STORAGE_KEY = "drivearound-data-v2";
 
-const defaultSources = [
-  {
-    id: "all",
-    name: "All jobs",
-    source: "all",
-    note: "18 new legs",
-    url: "",
-    icon: "A",
-    tone: "",
-    locked: true,
-  },
-  {
-    id: "movex",
-    name: "MoveX",
-    source: "movex",
-    note: "7 listed today",
-    url: "https://www.movex.co.uk/",
-    icon: "M",
-    tone: "teal",
-    locked: true,
-  },
-  {
-    id: "shiply",
-    name: "Shiply",
-    source: "shiply",
-    note: "5 suitable",
-    url: "https://www.shiply.com/",
-    icon: "S",
-    tone: "lime",
-    locked: true,
-  },
-  {
-    id: "dealer",
-    name: "Dealer portals",
-    source: "dealer",
-    note: "4 direct offers",
-    url: "",
-    icon: "D",
-    tone: "coral",
-    locked: true,
-  },
-  {
-    id: "saved",
-    name: "Favourites",
-    source: "saved",
-    note: "2 watched routes",
-    url: "",
-    icon: "F",
-    tone: "gold",
-    locked: true,
-  },
-];
+const starterData = {
+  home: "Bristol",
+  sources: [
+    {
+      id: "movex",
+      name: "MoveX",
+      note: "Job portal",
+      url: "https://www.movex.co.uk/",
+    },
+    {
+      id: "shiply",
+      name: "Shiply",
+      note: "Transport marketplace",
+      url: "https://www.shiply.com/",
+    },
+  ],
+  jobs: [
+    {
+      id: "sample-1",
+      source: "movex",
+      vehicle: "Audi A3 · sample",
+      from: "Bristol",
+      to: "Cheltenham",
+      date: todayValue(),
+      time: "08:20",
+      pay: 74,
+      miles: 44,
+      gap: 5,
+      notes: "Example job - edit or remove",
+    },
+    {
+      id: "sample-2",
+      source: "movex",
+      vehicle: "VW Golf · sample",
+      from: "Cheltenham",
+      to: "Oxford",
+      date: todayValue(),
+      time: "10:35",
+      pay: 92,
+      miles: 41,
+      gap: 3,
+      notes: "Example job - edit or remove",
+    },
+    {
+      id: "sample-3",
+      source: "shiply",
+      vehicle: "BMW 3 Series · sample",
+      from: "Oxford",
+      to: "Reading",
+      date: todayValue(),
+      time: "12:20",
+      pay: 68,
+      miles: 27,
+      gap: 7,
+      notes: "Example job - edit or remove",
+    },
+    {
+      id: "sample-4",
+      source: "movex",
+      vehicle: "Ford Puma · sample",
+      from: "Reading",
+      to: "Bath",
+      date: todayValue(),
+      time: "14:10",
+      pay: 122,
+      miles: 78,
+      gap: 11,
+      notes: "Example job - edit or remove",
+    },
+    {
+      id: "sample-5",
+      source: "shiply",
+      vehicle: "Nissan Juke · sample",
+      from: "Bath",
+      to: "Bristol",
+      date: todayValue(),
+      time: "16:25",
+      pay: 56,
+      miles: 13,
+      gap: 2,
+      notes: "Example job - edit or remove",
+    },
+  ],
+  planIds: [],
+};
 
 const state = {
+  data: loadData(),
   selectedSource: "all",
   filter: "all",
   query: "",
-  plan: [],
-  sources: loadSources(),
 };
 
-const jobList = document.querySelector("#jobList");
-const planList = document.querySelector("#planList");
-const sourceList = document.querySelector("#sourceList");
-const sourceDialog = document.querySelector("#sourceDialog");
-const sourceForm = document.querySelector("#sourceForm");
-const metrics = {
-  earnings: document.querySelector("#metricEarnings"),
-  paidMiles: document.querySelector("#metricPaidMiles"),
-  gaps: document.querySelector("#metricGapMiles"),
-  finish: document.querySelector("#metricFinish"),
+const elements = {
+  homeBase: document.querySelector("#homeBase"),
+  sourceList: document.querySelector("#sourceList"),
+  jobList: document.querySelector("#jobList"),
+  planList: document.querySelector("#planList"),
+  routeOverview: document.querySelector("#routeOverview"),
+  savedJobsCount: document.querySelector("#savedJobsCount"),
+  nextSuggestion: document.querySelector("#nextSuggestion"),
+  addSuggestion: document.querySelector("#addSuggestion"),
+  sourceDialog: document.querySelector("#sourceDialog"),
+  sourceForm: document.querySelector("#sourceForm"),
+  jobDialog: document.querySelector("#jobDialog"),
+  jobForm: document.querySelector("#jobForm"),
+  homeDialog: document.querySelector("#homeDialog"),
+  homeForm: document.querySelector("#homeForm"),
+  toast: document.querySelector("#toast"),
+  metrics: {
+    earnings: document.querySelector("#metricEarnings"),
+    paidMiles: document.querySelector("#metricPaidMiles"),
+    gaps: document.querySelector("#metricGapMiles"),
+    finish: document.querySelector("#metricFinish"),
+  },
 };
-const nextSuggestion = document.querySelector("#nextSuggestion");
 
-function loadSources() {
-  const saved = localStorage.getItem("drivearound-sources");
-  if (!saved) return defaultSources;
-
-  try {
-    const customSources = JSON.parse(saved);
-    return [...defaultSources, ...customSources];
-  } catch {
-    return defaultSources;
-  }
+function todayValue() {
+  const date = new Date();
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
 }
 
-function saveCustomSources() {
-  const customSources = state.sources.filter((source) => !source.locked);
-  localStorage.setItem("drivearound-sources", JSON.stringify(customSources));
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function loadData() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (stored?.sources && stored?.jobs) {
+      return {
+        home: stored.home || "",
+        sources: stored.sources,
+        jobs: stored.jobs,
+        planIds: stored.planIds || [],
+      };
+    }
+  } catch {
+    // Invalid saved data falls back to a clean starter set.
+  }
+  return clone(starterData);
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+}
+
+function makeId(prefix) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function normalizePlace(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function samePlace(a, b) {
+  const left = normalizePlace(a);
+  const right = normalizePlace(b);
+  return left === right || left.startsWith(`${right} `) || right.startsWith(`${left} `);
 }
 
 function normalizeUrl(url) {
@@ -169,227 +167,398 @@ function normalizeUrl(url) {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
 
-function getSourceInitial(name) {
-  return name.trim().charAt(0).toUpperCase() || "W";
+function escapeHtml(value) {
+  const div = document.createElement("div");
+  div.textContent = String(value ?? "");
+  return div.innerHTML;
+}
+
+function getSource(id) {
+  return state.data.sources.find((source) => source.id === id);
+}
+
+function getPlan() {
+  return state.data.planIds
+    .map((id) => state.data.jobs.find((job) => job.id === id))
+    .filter(Boolean);
 }
 
 function getLastStop() {
-  return state.plan.length ? state.plan[state.plan.length - 1].to : "Bristol";
+  const plan = getPlan();
+  return plan.length ? plan[plan.length - 1].to : state.data.home;
 }
 
 function isCompatible(job) {
-  return job.from === getLastStop() || state.plan.length === 0;
+  const plan = getPlan();
+  return plan.length === 0 || samePlace(job.from, getLastStop());
 }
 
-function getVisibleJobs() {
-  return jobs.filter((job) => {
-    const sourceMatch = state.selectedSource === "all" || job.source === state.selectedSource;
-    const searchText = `${job.vehicle} ${job.from} ${job.to} ${job.source}`.toLowerCase();
-    const queryMatch = searchText.includes(state.query.toLowerCase());
-    const filterMatch =
-      state.filter === "all" ||
-      (state.filter === "near" && isCompatible(job)) ||
-      (state.filter === "return" && (job.to === "Bristol" || job.tags.includes("heads home")));
-    const notPlanned = !state.plan.some((planned) => planned.id === job.id);
-
-    return sourceMatch && queryMatch && filterMatch && notPlanned;
-  });
+function formatMoney(value) {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+    maximumFractionDigits: Number(value) % 1 ? 2 : 0,
+  }).format(value);
 }
 
-function formatSource(source) {
-  return {
-    movex: "MoveX",
-    shiply: "Shiply",
-    dealer: "Dealer",
-  }[source] || "Custom site";
+function formatDate(value) {
+  if (!value) return "No date";
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(new Date(`${value}T12:00:00`));
+}
+
+function showToast(message) {
+  elements.toast.textContent = message;
+  elements.toast.classList.add("show");
+  window.clearTimeout(showToast.timer);
+  showToast.timer = window.setTimeout(() => elements.toast.classList.remove("show"), 2400);
 }
 
 function renderSources() {
-  sourceList.innerHTML = "";
+  elements.sourceList.innerHTML = "";
 
-  state.sources.forEach((source) => {
+  const allItem = document.createElement("div");
+  allItem.className = `source ${state.selectedSource === "all" ? "active" : ""}`;
+  allItem.innerHTML = `
+    <button class="source-main" type="button" data-source="all">
+      <span class="source-icon">A</span>
+      <span><strong>All jobs</strong><small>${state.data.jobs.length} available</small></span>
+    </button>
+  `;
+  elements.sourceList.append(allItem);
+
+  state.data.sources.forEach((source, index) => {
+    const count = state.data.jobs.filter((job) => job.source === source.id).length;
     const item = document.createElement("div");
-    item.className = `source ${state.selectedSource === source.source ? "active" : ""}`;
-
-    const main = document.createElement("button");
-    main.className = "source-main";
-    main.type = "button";
-    main.dataset.source = source.source;
-
-    const icon = document.createElement("span");
-    icon.className = `source-icon ${source.tone || ""}`.trim();
-    icon.textContent = source.icon;
-
-    const text = document.createElement("span");
-    const name = document.createElement("strong");
-    const note = document.createElement("small");
-    name.textContent = source.name;
-    note.textContent = source.note;
-    text.append(name, note);
-    main.append(icon, text);
-
-    const actions = document.createElement("span");
-    actions.className = "source-actions";
-
-    if (source.url) {
-      const open = document.createElement("a");
-      open.className = "source-open";
-      open.href = source.url;
-      open.target = "_blank";
-      open.rel = "noreferrer";
-      open.textContent = "Open";
-      actions.append(open);
-    }
-
-    if (!source.locked) {
-      const remove = document.createElement("button");
-      remove.className = "source-remove";
-      remove.type = "button";
-      remove.dataset.removeSource = source.id;
-      remove.setAttribute("aria-label", `Remove ${source.name}`);
-      remove.textContent = "x";
-      actions.append(remove);
-    }
-
-    item.append(main, actions);
-    sourceList.append(item);
+    item.className = `source ${state.selectedSource === source.id ? "active" : ""}`;
+    item.innerHTML = `
+      <button class="source-main" type="button" data-source="${escapeHtml(source.id)}">
+        <span class="source-icon tone-${index % 4}">${escapeHtml(source.name.charAt(0).toUpperCase())}</span>
+        <span>
+          <strong>${escapeHtml(source.name)}</strong>
+          <small>${count} jobs · ${escapeHtml(source.note || "Website shortcut")}</small>
+        </span>
+      </button>
+      <span class="source-actions">
+        <a class="source-open" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">Open</a>
+        <button class="source-menu" type="button" data-edit-source="${escapeHtml(source.id)}" aria-label="Edit ${escapeHtml(source.name)}">•••</button>
+      </span>
+    `;
+    elements.sourceList.append(item);
   });
 }
 
-function renderJobs() {
-  const visibleJobs = getVisibleJobs();
-  jobList.innerHTML = "";
+function getVisibleJobs() {
+  const planIds = new Set(state.data.planIds);
+  return state.data.jobs
+    .filter((job) => {
+      const sourceMatch = state.selectedSource === "all" || job.source === state.selectedSource;
+      const text = `${job.vehicle} ${job.from} ${job.to} ${getSource(job.source)?.name || ""} ${job.notes}`.toLowerCase();
+      const queryMatch = text.includes(state.query.toLowerCase());
+      const filterMatch =
+        state.filter === "all" ||
+        (state.filter === "near" && isCompatible(job)) ||
+        (state.filter === "return" && samePlace(job.to, state.data.home));
+      return sourceMatch && queryMatch && filterMatch && !planIds.has(job.id);
+    })
+    .sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
+}
 
-  if (!visibleJobs.length) {
-    jobList.innerHTML = '<div class="empty-state">No matching legs right now. Widen the filter or clear search.</div>';
+function renderJobs() {
+  const jobs = getVisibleJobs();
+  elements.jobList.innerHTML = "";
+
+  if (!jobs.length) {
+    elements.jobList.innerHTML = `
+      <div class="empty-state">
+        <strong>No jobs match this view.</strong>
+        <span>Add a job or change the current filter.</span>
+        <button class="primary-button slim" type="button" data-empty-add>Add job</button>
+      </div>
+    `;
     return;
   }
 
-  visibleJobs.forEach((job) => {
+  jobs.forEach((job) => {
+    const source = getSource(job.source);
+    const homebound = samePlace(job.to, state.data.home);
     const card = document.createElement("article");
     card.className = `job-card ${isCompatible(job) ? "compatible" : ""}`;
     card.innerHTML = `
       <div>
-        <h4>${job.from} to ${job.to} · ${job.vehicle}</h4>
+        <div class="job-title-row">
+          <h4>${escapeHtml(job.from)} to ${escapeHtml(job.to)}</h4>
+          ${isCompatible(job) ? '<span class="match-badge">Matches next</span>' : ""}
+        </div>
+        <p class="vehicle-line">${escapeHtml(job.vehicle)}</p>
         <div class="job-meta">
-          <span>${formatSource(job.source)}</span>
-          <span>${job.start}</span>
-          <span>${job.miles} paid mi</span>
-          <span>${job.gap} mi gap</span>
+          <span>${escapeHtml(source?.name || "Other")}</span>
+          <span>${formatDate(job.date)} · ${escapeHtml(job.time)}</span>
+          <span>${Number(job.miles)} paid mi</span>
+          <span>${Number(job.gap)} mi gap</span>
         </div>
-        <div class="job-tags">
-          ${job.tags.map((tag) => `<span class="${tag.includes("home") || tag.includes("match") ? "good" : ""}">${tag}</span>`).join("")}
-        </div>
+        ${job.notes ? `<p class="job-note">${escapeHtml(job.notes)}</p>` : ""}
+        ${homebound ? '<div class="job-tags"><span class="good">Gets home</span></div>' : ""}
       </div>
       <div class="job-pay">
-        <strong>£${job.pay}</strong>
-        <button class="primary-button slim" type="button" data-add="${job.id}">Add leg</button>
+        <strong>${formatMoney(Number(job.pay))}</strong>
+        <div class="card-actions">
+          <button class="icon-button" type="button" data-edit-job="${escapeHtml(job.id)}" aria-label="Edit job" title="Edit job">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </button>
+          <button class="primary-button slim" type="button" data-add="${escapeHtml(job.id)}">Add leg</button>
+        </div>
       </div>
     `;
-    jobList.append(card);
+    elements.jobList.append(card);
   });
 }
 
 function renderPlan() {
-  planList.innerHTML = "";
+  const plan = getPlan();
+  elements.planList.innerHTML = "";
 
-  if (!state.plan.length) {
-    planList.innerHTML = '<li class="empty-state">Add a paid leg to start building a chain from home.</li>';
+  if (!plan.length) {
+    elements.planList.innerHTML = `
+      <li class="empty-state">
+        <strong>No route planned yet.</strong>
+        <span>Add a leg manually or build the best chain.</span>
+      </li>
+    `;
   } else {
-    state.plan.forEach((job, index) => {
+    plan.forEach((job, index) => {
+      const previousStop = index === 0 ? state.data.home : plan[index - 1].to;
+      const connected = samePlace(job.from, previousStop);
       const item = document.createElement("li");
-      item.className = "plan-item";
+      item.className = `plan-item ${connected ? "" : "disconnected"}`;
       item.innerHTML = `
         <span class="plan-number">${index + 1}</span>
         <div>
-          <h4>${job.vehicle}: ${job.from} to ${job.to}</h4>
-          <p>${job.start} · £${job.pay} · ${job.miles} paid miles · ${job.gap} unpaid gap</p>
+          <h4>${escapeHtml(job.from)} to ${escapeHtml(job.to)}</h4>
+          <p>${escapeHtml(job.vehicle)} · ${escapeHtml(job.time)} · ${formatMoney(Number(job.pay))}</p>
+          ${connected ? "" : `<small class="warning">Reposition needed from ${escapeHtml(previousStop)}</small>`}
         </div>
-        <button class="remove-button" type="button" aria-label="Remove ${job.vehicle}" data-remove="${job.id}">×</button>
+        <button class="remove-button" type="button" aria-label="Remove ${escapeHtml(job.vehicle)}" data-remove="${escapeHtml(job.id)}">x</button>
       `;
-      planList.append(item);
+      elements.planList.append(item);
     });
   }
 
-  updateMetrics();
+  renderRouteOverview(plan);
+  updateMetrics(plan);
   updateSuggestion();
   renderJobs();
+  renderSources();
 }
 
-function updateMetrics() {
-  const earnings = state.plan.reduce((sum, job) => sum + job.pay, 0);
-  const paidMiles = state.plan.reduce((sum, job) => sum + job.miles, 0);
-  const gaps = state.plan.reduce((sum, job) => sum + job.gap, 0);
-  const lastStop = getLastStop();
+function renderRouteOverview(plan) {
+  const stops = [state.data.home, ...plan.map((job) => job.to)].filter(Boolean);
+  elements.routeOverview.innerHTML = stops
+    .map(
+      (stop, index) => `
+        <div class="route-stop ${index === 0 ? "home-stop" : ""}">
+          <span>${index === 0 ? "H" : index}</span>
+          <strong>${escapeHtml(stop)}</strong>
+        </div>
+        ${index < stops.length - 1 ? '<span class="route-arrow">→</span>' : ""}
+      `,
+    )
+    .join("");
+}
 
-  metrics.earnings.textContent = `£${earnings}`;
-  metrics.paidMiles.textContent = `${paidMiles}`;
-  metrics.gaps.textContent = `${gaps} mi`;
-  metrics.finish.textContent = lastStop === "Bristol" ? "Home" : lastStop;
+function updateMetrics(plan) {
+  const earnings = plan.reduce((sum, job) => sum + Number(job.pay), 0);
+  const paidMiles = plan.reduce((sum, job) => sum + Number(job.miles), 0);
+  const gaps = plan.reduce((sum, job) => sum + Number(job.gap), 0);
+  const lastStop = plan.length ? plan[plan.length - 1].to : state.data.home;
+
+  elements.metrics.earnings.textContent = formatMoney(earnings);
+  elements.metrics.paidMiles.textContent = String(paidMiles);
+  elements.metrics.gaps.textContent = `${gaps} mi`;
+  elements.metrics.finish.textContent = samePlace(lastStop, state.data.home) ? "Home" : lastStop || "Not set";
+}
+
+function rankJob(job) {
+  const homeBonus = samePlace(job.to, state.data.home) ? 30 : 0;
+  return Number(job.pay) - Number(job.gap) * 1.25 + homeBonus;
 }
 
 function getBestNextJob() {
-  const lastStop = getLastStop();
-  const candidates = jobs.filter((job) => {
-    const unused = !state.plan.some((planned) => planned.id === job.id);
-    return unused && (job.from === lastStop || state.plan.length === 0);
-  });
-
-  return candidates.sort((a, b) => b.pay / Math.max(b.gap, 1) - a.pay / Math.max(a.gap, 1))[0];
+  const planIds = new Set(state.data.planIds);
+  const available = state.data.jobs.filter((job) => !planIds.has(job.id));
+  const compatible = available.filter((job) => isCompatible(job));
+  return compatible.sort((a, b) => rankJob(b) - rankJob(a))[0];
 }
 
 function updateSuggestion() {
   const suggestion = getBestNextJob();
-  const button = document.querySelector("#addSuggestion");
-
   if (!suggestion) {
-    nextSuggestion.textContent = "No direct next leg. Check the websites for a short reposition.";
-    button.disabled = true;
+    elements.nextSuggestion.textContent = "No direct next leg. Add a job from the current finish.";
+    elements.addSuggestion.disabled = true;
+    delete elements.addSuggestion.dataset.id;
     return;
   }
 
-  nextSuggestion.textContent = `${suggestion.from} to ${suggestion.to} in the ${suggestion.vehicle} for £${suggestion.pay}.`;
-  button.disabled = false;
-  button.dataset.id = suggestion.id;
+  elements.nextSuggestion.textContent = `${suggestion.from} to ${suggestion.to} for ${formatMoney(Number(suggestion.pay))}.`;
+  elements.addSuggestion.disabled = false;
+  elements.addSuggestion.dataset.id = suggestion.id;
 }
 
-function addJob(id) {
-  const job = jobs.find((item) => item.id === id);
-  if (!job || state.plan.some((item) => item.id === id)) return;
-  state.plan.push(job);
+function buildBestChain() {
+  const unused = [...state.data.jobs];
+  const chain = [];
+  let current = state.data.home;
+
+  while (unused.length) {
+    const candidates = unused.filter((job) => samePlace(job.from, current));
+    if (!candidates.length) break;
+    candidates.sort((a, b) => rankJob(b) - rankJob(a));
+    const next = candidates[0];
+    chain.push(next);
+    current = next.to;
+    unused.splice(unused.findIndex((job) => job.id === next.id), 1);
+  }
+
+  state.data.planIds = chain.map((job) => job.id);
+  saveData();
+  renderPlan();
+  showToast(chain.length ? `Built a ${chain.length}-leg chain` : "Add jobs before building a chain");
+}
+
+function addJobToPlan(id) {
+  if (!state.data.planIds.includes(id)) {
+    state.data.planIds.push(id);
+    saveData();
+    renderPlan();
+  }
+}
+
+function populateSourceSelect(selectedId = "") {
+  const select = document.querySelector("#jobSource");
+  select.innerHTML = state.data.sources
+    .map((source) => `<option value="${escapeHtml(source.id)}">${escapeHtml(source.name)}</option>`)
+    .join("");
+  if (selectedId) select.value = selectedId;
+}
+
+function openJobDialog(job = null) {
+  elements.jobForm.reset();
+  document.querySelector("#jobDialogTitle").textContent = job ? "Edit job" : "Add job";
+  document.querySelector("#jobId").value = job?.id || "";
+  document.querySelector("#jobFrom").value = job?.from || "";
+  document.querySelector("#jobTo").value = job?.to || "";
+  document.querySelector("#jobDate").value = job?.date || todayValue();
+  document.querySelector("#jobTime").value = job?.time || "09:00";
+  document.querySelector("#jobPay").value = job?.pay ?? "";
+  document.querySelector("#jobMiles").value = job?.miles ?? "";
+  document.querySelector("#jobGap").value = job?.gap ?? 0;
+  document.querySelector("#jobVehicle").value = job?.vehicle || "";
+  document.querySelector("#jobNotes").value = job?.notes || "";
+  document.querySelector("#deleteJob").hidden = !job;
+  populateSourceSelect(job?.source);
+  elements.jobDialog.showModal();
+}
+
+function openSourceDialog(source = null) {
+  elements.sourceForm.reset();
+  document.querySelector("#sourceDialogTitle").textContent = source ? "Edit website" : "Add website";
+  document.querySelector("#sourceId").value = source?.id || "";
+  document.querySelector("#siteName").value = source?.name || "";
+  document.querySelector("#siteUrl").value = source?.url || "";
+  document.querySelector("#siteNotes").value = source?.note || "";
+  document.querySelector("#deleteSource").hidden = !source;
+  elements.sourceDialog.showModal();
+}
+
+function deleteJob(id) {
+  state.data.jobs = state.data.jobs.filter((job) => job.id !== id);
+  state.data.planIds = state.data.planIds.filter((jobId) => jobId !== id);
+  saveData();
+  renderAll();
+  showToast("Job removed");
+}
+
+function deleteSource(id) {
+  const used = state.data.jobs.some((job) => job.source === id);
+  if (used) {
+    showToast("Remove or reassign this website's jobs first");
+    return;
+  }
+  state.data.sources = state.data.sources.filter((source) => source.id !== id);
+  if (state.selectedSource === id) state.selectedSource = "all";
+  saveData();
+  renderAll();
+  showToast("Website removed");
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state.data, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `drivearound-backup-${todayValue()}.json`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast("Backup downloaded");
+}
+
+async function importData(file) {
+  try {
+    const incoming = JSON.parse(await file.text());
+    if (!Array.isArray(incoming.sources) || !Array.isArray(incoming.jobs)) throw new Error();
+    state.data = {
+      home: incoming.home || "",
+      sources: incoming.sources,
+      jobs: incoming.jobs,
+      planIds: incoming.planIds || [],
+    };
+    saveData();
+    renderAll();
+    showToast("Backup imported");
+  } catch {
+    showToast("That backup file could not be read");
+  }
+}
+
+function renderAll() {
+  elements.homeBase.textContent = state.data.home || "Set home";
+  elements.savedJobsCount.textContent = String(state.data.jobs.length);
+  document.querySelector("#dateLabel").textContent = new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date());
+  renderSources();
   renderPlan();
 }
 
-function removeJob(id) {
-  state.plan = state.plan.filter((job) => job.id !== id);
-  renderPlan();
-}
-
-jobList.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-add]");
-  if (button) addJob(button.dataset.add);
-});
-
-planList.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-remove]");
-  if (button) removeJob(button.dataset.remove);
-});
-
-sourceList.addEventListener("click", (event) => {
-  const sourceButton = event.target.closest("[data-source]");
-  const removeButton = event.target.closest("[data-remove-source]");
-
-  if (sourceButton) {
-    state.selectedSource = sourceButton.dataset.source;
+elements.sourceList.addEventListener("click", (event) => {
+  const filterButton = event.target.closest("[data-source]");
+  const editButton = event.target.closest("[data-edit-source]");
+  if (filterButton) {
+    state.selectedSource = filterButton.dataset.source;
     renderSources();
     renderJobs();
   }
+  if (editButton) openSourceDialog(getSource(editButton.dataset.editSource));
+});
 
-  if (removeButton) {
-    state.sources = state.sources.filter((source) => source.id !== removeButton.dataset.removeSource);
-    saveCustomSources();
-    renderSources();
-  }
+elements.jobList.addEventListener("click", (event) => {
+  const addButton = event.target.closest("[data-add]");
+  const editButton = event.target.closest("[data-edit-job]");
+  if (addButton) addJobToPlan(addButton.dataset.add);
+  if (editButton) openJobDialog(state.data.jobs.find((job) => job.id === editButton.dataset.editJob));
+  if (event.target.closest("[data-empty-add]")) openJobDialog();
+});
+
+elements.planList.addEventListener("click", (event) => {
+  const removeButton = event.target.closest("[data-remove]");
+  if (!removeButton) return;
+  state.data.planIds = state.data.planIds.filter((id) => id !== removeButton.dataset.remove);
+  saveData();
+  renderPlan();
 });
 
 document.querySelectorAll(".segmented button").forEach((button) => {
@@ -406,48 +575,95 @@ document.querySelector("#searchInput").addEventListener("input", (event) => {
   renderJobs();
 });
 
-document.querySelector("#optimizeButton").addEventListener("click", () => {
-  state.plan = ["mx-104", "dl-221", "sh-552", "mx-118", "dl-235"].map((id) =>
-    jobs.find((job) => job.id === id),
-  );
-  renderPlan();
-});
-
+document.querySelector("#addJob").addEventListener("click", () => openJobDialog());
+document.querySelector("#addSource").addEventListener("click", () => openSourceDialog());
+document.querySelector("#optimizeButton").addEventListener("click", buildBestChain);
 document.querySelector("#clearPlan").addEventListener("click", () => {
-  state.plan = [];
+  state.data.planIds = [];
+  saveData();
   renderPlan();
 });
-
-document.querySelector("#addSuggestion").addEventListener("click", (event) => {
-  addJob(event.currentTarget.dataset.id);
+document.querySelector("#addSuggestion").addEventListener("click", (event) => addJobToPlan(event.currentTarget.dataset.id));
+document.querySelector("#deleteJob").addEventListener("click", () => {
+  const id = document.querySelector("#jobId").value;
+  if (!id) return;
+  elements.jobDialog.close();
+  deleteJob(id);
+});
+document.querySelector("#deleteSource").addEventListener("click", () => {
+  const id = document.querySelector("#sourceId").value;
+  if (!id) return;
+  const before = state.data.sources.length;
+  deleteSource(id);
+  if (state.data.sources.length < before) elements.sourceDialog.close();
 });
 
-document.querySelector("#addSource").addEventListener("click", () => {
-  sourceForm.reset();
-  sourceDialog.showModal();
+document.querySelector("#editHome").addEventListener("click", () => {
+  document.querySelector("#homeInput").value = state.data.home;
+  elements.homeDialog.showModal();
 });
 
-sourceForm.addEventListener("submit", (event) => {
-  if (sourceForm.returnValue === "cancel" || event.submitter?.value === "cancel") return;
-
-  const name = document.querySelector("#siteName").value.trim();
-  const url = normalizeUrl(document.querySelector("#siteUrl").value.trim());
-  const note = document.querySelector("#siteNotes").value.trim() || "Login shortcut";
-  if (!name || !url) return;
-
-  state.sources.push({
-    id: `custom-${Date.now()}`,
-    name,
-    source: `custom-${Date.now()}`,
-    note,
-    url,
-    icon: getSourceInitial(name),
-    tone: "",
-    locked: false,
-  });
-  saveCustomSources();
-  renderSources();
+elements.homeForm.addEventListener("submit", (event) => {
+  if (event.submitter?.value !== "save") return;
+  state.data.home = document.querySelector("#homeInput").value.trim();
+  saveData();
+  renderAll();
+  showToast("Home base saved");
 });
 
-renderSources();
-renderPlan();
+elements.sourceForm.addEventListener("submit", (event) => {
+  if (event.submitter?.value !== "save") return;
+  const id = document.querySelector("#sourceId").value;
+  const source = {
+    id: id || makeId("source"),
+    name: document.querySelector("#siteName").value.trim(),
+    url: normalizeUrl(document.querySelector("#siteUrl").value.trim()),
+    note: document.querySelector("#siteNotes").value.trim(),
+  };
+  const existing = state.data.sources.findIndex((item) => item.id === id);
+  if (existing >= 0) state.data.sources[existing] = source;
+  else state.data.sources.push(source);
+  saveData();
+  renderAll();
+  showToast(id ? "Website updated" : "Website added");
+});
+
+elements.jobForm.addEventListener("submit", (event) => {
+  if (event.submitter?.value !== "save") return;
+  const id = document.querySelector("#jobId").value;
+  const job = {
+    id: id || makeId("job"),
+    source: document.querySelector("#jobSource").value,
+    vehicle: document.querySelector("#jobVehicle").value.trim(),
+    from: document.querySelector("#jobFrom").value.trim(),
+    to: document.querySelector("#jobTo").value.trim(),
+    date: document.querySelector("#jobDate").value,
+    time: document.querySelector("#jobTime").value,
+    pay: Number(document.querySelector("#jobPay").value),
+    miles: Number(document.querySelector("#jobMiles").value),
+    gap: Number(document.querySelector("#jobGap").value),
+    notes: document.querySelector("#jobNotes").value.trim(),
+  };
+  const existing = state.data.jobs.findIndex((item) => item.id === id);
+  if (existing >= 0) state.data.jobs[existing] = job;
+  else state.data.jobs.push(job);
+  saveData();
+  renderAll();
+  showToast(id ? "Job updated" : "Job added");
+});
+
+document.querySelector("#exportData").addEventListener("click", exportData);
+document.querySelector("#importData").addEventListener("click", () => document.querySelector("#importFile").click());
+document.querySelector("#importFile").addEventListener("change", (event) => {
+  if (event.target.files[0]) importData(event.target.files[0]);
+  event.target.value = "";
+});
+
+window.addEventListener("keydown", (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "j") {
+    event.preventDefault();
+    openJobDialog();
+  }
+});
+
+renderAll();

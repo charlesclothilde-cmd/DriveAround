@@ -29,7 +29,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -219,6 +220,8 @@ svg {
 }
 
 .source-open {
+  display: inline-flex;
+  align-items: center;
   min-height: 32px;
   padding: 0 10px;
   color: #fff;
@@ -234,6 +237,19 @@ svg {
   place-items: center;
   width: 32px;
   height: 32px;
+  color: var(--muted);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.source-menu {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   color: var(--muted);
   background: #fff;
   border: 1px solid var(--line);
@@ -264,8 +280,41 @@ svg {
   background: var(--gold);
 }
 
+.source-icon.tone-0 {
+  background: var(--teal);
+}
+
+.source-icon.tone-1 {
+  background: var(--lime);
+}
+
+.source-icon.tone-2 {
+  background: var(--coral);
+}
+
+.source-icon.tone-3 {
+  background: var(--gold);
+}
+
 .compact {
   margin-top: auto;
+}
+
+.data-actions,
+.card-actions,
+.job-title-row,
+.dialog-heading {
+  display: flex;
+  align-items: center;
+}
+
+.data-actions {
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.data-actions .small-button {
+  flex: 1;
 }
 
 .stat-row {
@@ -298,6 +347,7 @@ main {
 
 .top-actions {
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .search-wrap {
@@ -325,6 +375,13 @@ main {
   border-radius: 8px;
   border: 1px solid transparent;
   font-weight: 800;
+}
+
+.command-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .primary-button {
@@ -458,6 +515,38 @@ main {
   font-size: 1rem;
 }
 
+.job-title-row {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.job-title-row h4 {
+  margin: 0;
+}
+
+.match-badge {
+  padding: 4px 7px;
+  color: #0f6847;
+  background: #dff1ea;
+  border-radius: 7px;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.vehicle-line,
+.job-note {
+  margin: 7px 0 9px;
+}
+
+.vehicle-line {
+  font-weight: 750;
+}
+
+.job-note {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
 .job-meta,
 .job-tags {
   display: flex;
@@ -495,50 +584,53 @@ main {
   font-size: 1.55rem;
 }
 
-.map-panel {
-  position: relative;
-  height: 220px;
+.route-overview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 76px;
   margin-bottom: 12px;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(31, 122, 90, 0.15), transparent 38%),
-    linear-gradient(45deg, transparent 46%, rgba(31, 140, 151, 0.16) 46% 54%, transparent 54%),
-    #fff;
+  padding: 12px;
+  overflow-x: auto;
+  background: #fff;
   border: 1px solid var(--line);
   border-radius: 8px;
 }
 
-.route-line {
-  position: absolute;
-  inset: 40px 46px 54px 38px;
-  border-top: 4px solid #2c7868;
-  border-right: 4px solid #2c7868;
-  border-radius: 0 55px 0 0;
-  transform: skewY(-10deg);
-  opacity: 0.58;
+.route-stop {
+  display: grid;
+  justify-items: center;
+  flex: 0 0 auto;
+  gap: 5px;
+  min-width: 72px;
 }
 
-.map-town {
-  position: absolute;
-  transform: translate(-50%, -50%);
+.route-stop span {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   color: #fff;
   background: var(--night);
   border-radius: 8px;
-  font-size: 0.78rem;
   font-weight: 900;
-  box-shadow: var(--shadow);
 }
 
-.map-town.home {
+.route-stop.home-stop span {
   background: var(--green);
 }
 
-.map-town.finish {
-  background: var(--coral);
+.route-stop strong {
+  max-width: 112px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.route-arrow {
+  color: var(--muted);
+  font-weight: 900;
 }
 
 .plan-list {
@@ -574,6 +666,17 @@ main {
   color: var(--muted);
 }
 
+.plan-item.disconnected {
+  border-color: #d99a88;
+}
+
+.warning {
+  display: block;
+  margin-top: 5px;
+  color: #a33f28;
+  font-weight: 750;
+}
+
 .remove-button {
   width: 34px;
   height: 34px;
@@ -585,6 +688,9 @@ main {
 }
 
 .empty-state {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
   padding: 18px;
   color: var(--muted);
   background: #fff;
@@ -604,11 +710,20 @@ main {
   color: #c9d7d2;
 }
 
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 dialog {
   width: min(440px, calc(100vw - 28px));
   border: 0;
   border-radius: 8px;
   box-shadow: var(--shadow);
+}
+
+#jobDialog {
+  width: min(760px, calc(100vw - 28px));
 }
 
 dialog::backdrop {
@@ -621,6 +736,15 @@ dialog::backdrop {
   padding: 6px;
 }
 
+.dialog-card.wide {
+  width: 100%;
+}
+
+.dialog-heading {
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .dialog-card label {
   display: grid;
   gap: 6px;
@@ -628,11 +752,21 @@ dialog::backdrop {
   font-weight: 800;
 }
 
-.dialog-card input {
+.dialog-card input,
+.dialog-card select {
+  width: 100%;
   min-height: 42px;
   padding: 0 12px;
+  color: var(--ink);
+  background: #fff;
   border: 1px solid var(--line);
   border-radius: 8px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .dialog-card menu {
@@ -641,6 +775,42 @@ dialog::backdrop {
   gap: 10px;
   margin: 0;
   padding: 0;
+}
+
+.danger-button {
+  min-height: 40px;
+  padding: 0 12px;
+  color: #a33f28;
+  background: #fff;
+  border: 1px solid #dfb4a9;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.menu-spacer {
+  flex: 1;
+}
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10;
+  max-width: min(360px, calc(100vw - 40px));
+  padding: 12px 16px;
+  color: #fff;
+  background: var(--night);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 @media (max-width: 1050px) {
@@ -719,7 +889,23 @@ dialog::backdrop {
     gap: 10px;
   }
 
-  .map-panel {
-    height: 184px;
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dialog-card.wide {
+    width: auto;
+  }
+
+  .dialog-card menu {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-card menu button {
+    width: 100%;
+  }
+
+  .menu-spacer {
+    display: none;
   }
 }

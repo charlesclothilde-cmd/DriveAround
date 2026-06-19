@@ -1,18 +1,19 @@
 # DriveAround
 
-A static private dashboard prototype for chaining paid car delivery jobs into one driving day.
+A browser-based dashboard for recording paid vehicle movements and chaining compatible jobs into one driving day.
 
-## Publish with GitHub Pages
+## First-time setup
 
-1. Create a new GitHub repository.
-2. Push this folder to the repository.
-3. In GitHub, open `Settings` > `Pages`.
-4. Under `Build and deployment`, choose `Deploy from a branch`.
-5. Select the `main` branch and the `/root` folder.
-6. Save, then wait for GitHub to publish the site URL.
+1. Open the published dashboard.
+2. Set the home base.
+3. Add or edit the paying website shortcuts.
+4. Remove the sample jobs and enter real available jobs.
+5. Build a chain automatically or add legs manually.
 
-## Passwords and logins
+The dashboard saves home, websites, jobs, and the current route in that browser. Use **Export** to download a backup and **Import** to transfer it to another device.
 
-Do not put driving-site passwords in this repository or in the dashboard code. The dashboard opens each real website in a new tab, and your dad should log in using his browser or password manager.
+## Passwords and privacy
 
-Custom website shortcuts are saved in the browser with `localStorage`, so each device has its own list.
+Never put passwords in this repository or in job notes. Website shortcuts open the real site in a new tab, where the browser or password manager can handle login.
+
+GitHub Pages serves the application publicly, but dashboard data is stored locally in the browser and is not committed to GitHub.
